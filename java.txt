@@ -1,0 +1,28 @@
+Java 17
+Reason: modern LTS Java version, stable and industry standard.
+
+Maven
+Reason: manages project build and dependencies automatically.
+
+Spring Boot
+Reason: fast way to build REST backend APIs with less boilerplate.
+
+Spring Web (spring-boot-starter-web)
+Reason: used to create endpoints like translate, chat, health.
+
+Jakarta Validation (via spring-boot-starter-validation)
+Reason: validates request payloads so bad input is rejected cleanly.
+
+RestTemplate + RestTemplateBuilder
+Reason: Java backend calls the Python AI backend through HTTP using this client.
+
+Spring CORS Configuration
+Reason: allows frontend (React/Vite localhost) to call Java APIs without browser CORS errors.
+
+Spring Boot Maven Plugin
+Reason: run and package the app easily using Maven commands.
+
+Spring Boot Test (spring-boot-starter-test)
+Reason: provides testing framework support for unit/integration tests.
+
+Java backend is a Spring Boot gateway layer; frontend calls Java APIs, and Java forwards translation/chat work to the Python model service.

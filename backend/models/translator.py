@@ -16,13 +16,13 @@ class TranslationCache:
         self.max_size = max_size
         self.ttl = timedelta(hours=ttl_hours)
     
-    def _make_key(self, text: str, source_lang: str) -> str:
+    def _make_key(self, text: str, source_lang: str, target_lang: str) -> str:
         """Create cache key from text and language"""
-        return hashlib.md5(f"{source_lang}:{text}".encode()).hexdigest()
+        return hashlib.md5(f"{source_lang}:{target_lang}:{text}".encode()).hexdigest()
     
-    def get(self, text: str, source_lang: str) -> Optional[str]:
+    def get(self, text: str, source_lang: str, target_lang: str) -> Optional[str]:
         """Get cached translation if available and not expired"""
-        key = self._make_key(text, source_lang)
+        key = self._make_key(text, source_lang, target_lang)
         if key in self.cache:
             translation, timestamp = self.cache[key]
             if datetime.now() - timestamp < self.ttl:
@@ -32,14 +32,14 @@ class TranslationCache:
                 del self.cache[key]  # Remove expired entry
         return None
     
-    def set(self, text: str, source_lang: str, translation: str):
+    def set(self, text: str, source_lang: str, target_lang: str, translation: str):
         """Cache a translation"""
         if len(self.cache) >= self.max_size:
             # Remove oldest entry
             oldest_key = next(iter(self.cache))
             del self.cache[oldest_key]
         
-        key = self._make_key(text, source_lang)
+        key = self._make_key(text, source_lang, target_lang)
         self.cache[key] = (translation, datetime.now())
 
 class TranslationModel:
@@ -84,38 +84,43 @@ class TranslationModel:
             logger.error(f"❌ Error loading model: {e}")
             raise
     
-    def translate(self, text: str, source_lang: str) -> str:
+    def translate(self, text: str, source_lang: str, target_lang: str = "english") -> str:
         """
-        Translate text from Nepali/Sinhala to English.
+        Translate text between English, Nepali, and Sinhala.
         
         Args:
             text: Input text to translate
-            source_lang: Source language ('nepali' or 'sinhala')
+            source_lang: Source language ('english', 'nepali', 'sinhala')
+            target_lang: Target language ('english', 'nepali', 'sinhala')
             
         Returns:
-            Translated English text
+            Translated text
         """
         try:
+            normalized_source = source_lang.lower().strip()
+            normalized_target = target_lang.lower().strip()
+
+            if normalized_source == normalized_target:
+                return text
+
+            if normalized_source not in LANG_CODES:
+                raise ValueError(f"Unsupported source_lang: {source_lang}")
+
+            if normalized_target not in LANG_CODES:
+                raise ValueError(f"Unsupported target_lang: {target_lang}")
+
             # Check user memory first (highest priority - user corrections)
-            user_correction = user_memory.get_correction(text, source_lang)
+            user_correction = user_memory.get_correction(text, normalized_source, normalized_target)
             if user_correction:
                 return user_correction
             
             # Check cache second
-            cached_translation = self.cache.get(text, source_lang)
+            cached_translation = self.cache.get(text, normalized_source, normalized_target)
             if cached_translation:
                 return cached_translation
-            
-            # Determine source language code
-            if source_lang.lower().startswith('n'):
-                src_lang_code = LANG_CODES["nepali"]
-            elif source_lang.lower().startswith('s'):
-                src_lang_code = LANG_CODES["sinhala"]
-            else:
-                src_lang_code = LANG_CODES["nepali"]  # Default
-            
-            # Set target language (English)
-            tgt_lang_code = LANG_CODES["english"]
+
+            src_lang_code = LANG_CODES[normalized_source]
+            tgt_lang_code = LANG_CODES[normalized_target]
             
             # Tokenize input
             self.tokenizer.src_lang = src_lang_code
@@ -142,7 +147,7 @@ class TranslationModel:
             )[0]
             
             # Cache the translation
-            self.cache.set(text, source_lang, translation)
+            self.cache.set(text, normalized_source, normalized_target, translation)
             
             logger.info(f"Translation successful: {text[:50]}... → {translation[:50]}...")
             return translation
@@ -155,8 +160,8 @@ class TranslationModel:
 # Global model instance
 translator_model = TranslationModel()
 
-def translate_text(text: str, source_lang: str) -> str:
+def translate_text(text: str, source_lang: str, target_lang: str = "english") -> str:
     """Convenience function for translation."""
     if translator_model.model is None:
         translator_model.load_model()
-    return translator_model.translate(text, source_lang)
+    return translator_model.translate(text, source_lang, target_lang)

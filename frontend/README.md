@@ -11,7 +11,23 @@ AI-powered translation application for Nepali and Sinhala to English using LoRA 
 ### Prerequisites
 - Node.js 18+ 
 - npm or yarn
-- Backend API running on `localhost:8000`
+- Backend API running on either:
+  - `localhost:8000` (existing Python backend), or
+  - `localhost:8080` (new Java Spring Boot demo backend)
+
+### Java Demo Mode (for project presentation)
+
+```bash
+# terminal 1: run Java backend
+cd ../java-backend
+mvn spring-boot:run
+
+# terminal 2: run frontend
+cd ../frontend
+cp .env.java.example .env
+npm install
+npm run dev
+```
 
 ### Installation
 
@@ -139,7 +155,9 @@ frontend/
 Create `.env` file:
 
 ```env
-VITE_API_URL=http://localhost:8000/api
+VITE_API_URL=http://localhost:8000
+# or for Java demo backend:
+# VITE_API_URL=http://localhost:8080
 ```
 
 ### API Endpoints Used
@@ -348,7 +366,7 @@ Frontend Developers: 2 Members
 
 ## 📄 License
 
-This project was developed for Smart India Hackathon 2025.
+This project was developed for Smart India Hackathon 2025 and for java project too.
 
 ---
 

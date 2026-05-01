@@ -14,13 +14,13 @@ if (Get-Command node -ErrorAction SilentlyContinue) {
     exit 1
 }
 
-# Navigate to frontend directory
-$frontendPath = "d:\sih_datasets\frontend"
+# Navigate to frontend directory (use script location)
+$frontendPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 if (Test-Path $frontendPath) {
     Set-Location $frontendPath
-    Write-Host "✅ Found frontend directory" -ForegroundColor Green
+    Write-Host "✅ Found frontend directory: $frontendPath" -ForegroundColor Green
 } else {
-    Write-Host "❌ Frontend directory not found at $frontendPath" -ForegroundColor Red
+    Write-Host "❌ Frontend directory not found" -ForegroundColor Red
     exit 1
 }
 
@@ -46,14 +46,32 @@ if ($LASTEXITCODE -eq 0) {
     exit 1
 }
 
-# Check if backend is accessible
+# Check if backend is accessible (Python or Java)
 Write-Host "`n🔍 Checking backend availability..." -ForegroundColor Yellow
+$backendHealthy = $false
+
 try {
-    $response = Invoke-WebRequest -Uri "http://localhost:8000/api/health" -TimeoutSec 2 -ErrorAction SilentlyContinue
-    Write-Host "✅ Backend is running and healthy!" -ForegroundColor Green
+    $null = Invoke-WebRequest -Uri "http://localhost:8080/health/" -TimeoutSec 2 -ErrorAction Stop
+    Write-Host "✅ Java backend is running at http://localhost:8080" -ForegroundColor Green
+    $backendHealthy = $true
 } catch {
-    Write-Host "⚠️  Backend is not running yet" -ForegroundColor Yellow
-    Write-Host "   Start it with: cd backend && uvicorn app:app --reload" -ForegroundColor Gray
+    Write-Host "ℹ️  Java backend not detected on 8080" -ForegroundColor DarkYellow
+}
+
+if (-not $backendHealthy) {
+    try {
+        $null = Invoke-WebRequest -Uri "http://localhost:8000/health/" -TimeoutSec 2 -ErrorAction Stop
+        Write-Host "✅ Python backend is running at http://localhost:8000" -ForegroundColor Green
+        $backendHealthy = $true
+    } catch {
+        Write-Host "ℹ️  Python backend not detected on 8000" -ForegroundColor DarkYellow
+    }
+}
+
+if (-not $backendHealthy) {
+    Write-Host "⚠️  No backend is running yet" -ForegroundColor Yellow
+    Write-Host "   Java option:  cd ..\java-backend ; mvn spring-boot:run" -ForegroundColor Gray
+    Write-Host "   Python option: cd ..\backend ; uvicorn main:app --reload" -ForegroundColor Gray
 }
 
 # Summary
@@ -63,7 +81,9 @@ Write-Host "║  ✨ FRONTEND SETUP COMPLETE! ✨                ║" -Foregroun
 Write-Host "╚════════════════════════════════════════════════╝" -ForegroundColor Cyan
 
 Write-Host "`n📋 Next Steps:" -ForegroundColor Yellow
-Write-Host "   1. Ensure backend is running (see above)" -ForegroundColor White
+Write-Host "   1. Ensure Java backend is running (recommended for Java demo)" -ForegroundColor White
+Write-Host "      cd ..\java-backend ; mvn spring-boot:run" -ForegroundColor Gray
+Write-Host "      Then set frontend\.env -> VITE_API_URL=http://localhost:8080" -ForegroundColor Gray
 Write-Host "   2. Start frontend: " -ForegroundColor White -NoNewline
 Write-Host "npm run dev" -ForegroundColor Cyan
 Write-Host "   3. Open browser: " -ForegroundColor White -NoNewline

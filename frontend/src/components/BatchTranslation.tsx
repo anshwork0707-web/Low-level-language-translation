@@ -14,9 +14,12 @@ interface BatchFile {
 
 interface BatchTranslationProps {
   sourceLang: 'nepali' | 'sinhala' | 'english'
+  targetLang: 'nepali' | 'sinhala' | 'english'
 }
 
-export default function BatchTranslation({ sourceLang }: BatchTranslationProps) {
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+
+export default function BatchTranslation({ sourceLang, targetLang }: BatchTranslationProps) {
   const [files, setFiles] = useState<BatchFile[]>([])
   const [isProcessing, setIsProcessing] = useState(false)
 
@@ -90,12 +93,13 @@ export default function BatchTranslation({ sourceLang }: BatchTranslationProps) 
       }
 
       // Translate the extracted text
-      const translateResponse = await fetch('http://localhost:8000/translate/', {
+      const translateResponse = await fetch(`${API_BASE_URL}/translate/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           text: extractedText,
           source_lang: sourceLang,
+          target_lang: targetLang,
         }),
       })
 

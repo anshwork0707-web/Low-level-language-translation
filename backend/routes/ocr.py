@@ -152,7 +152,8 @@ async def extract_and_translate(
         
         translation = translator_model.translate(
             extracted_text,
-            source_lang=source_lang
+            source_lang=source_lang,
+            target_lang=target_lang
         )
         
         # Detect language
@@ -220,7 +221,8 @@ async def live_image_translation(
             # Translate the text
             translation = translator_model.translate(
                 text,
-                source_lang=source_lang
+                source_lang=source_lang,
+                target_lang=target_lang
             )
             
             text_regions.append({

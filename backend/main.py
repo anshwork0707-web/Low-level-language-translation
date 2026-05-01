@@ -3,13 +3,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from routes import translate, ocr, chatbot, health
 from models.translator import translator_model
 from core.utils import logger
+import os
 
 app = FastAPI(title="SIH Translation API", version="1.0.0")
+
+cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:5173")
+allowed_origins = [origin.strip() for origin in cors_origins.split(",") if origin.strip()]
 
 # CORS Middleware for frontend connection
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins (for development)
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

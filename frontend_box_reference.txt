@@ -1,0 +1,76 @@
+FRONTEND BOX REFERENCE (Viva Quick Guide)
+Project: SIH Translator Frontend
+
+How the frontend is wired
+1) Entry point: frontend/src/main.tsx
+2) App shell and page switch: frontend/src/App.tsx
+3) Main translation page layout: frontend/src/pages/TranslatePage.tsx
+4) Main translation box component: frontend/src/components/TranslationBox.tsx
+
+If teacher asks: "Where is this box in code?"
+
+A) Navbar (top menu with Translate/Image/About/theme/gov mode)
+- File: frontend/src/components/Navbar.tsx
+- Rendered from: frontend/src/App.tsx
+
+B) Main Translate box (the big card with input, From/To, Translate button)
+- File: frontend/src/components/TranslationBox.tsx
+- Wrapped by page: frontend/src/pages/TranslatePage.tsx
+
+C) "From" and "To" language dropdowns
+- File: frontend/src/components/TranslationBox.tsx
+- Section name in code comments: Language Selector
+
+D) Source text area (where user types text)
+- File: frontend/src/components/TranslationBox.tsx
+- Section name in code comments: Input Area
+
+E) Translate button
+- File: frontend/src/components/TranslationBox.tsx
+- Handler function: handleTranslate()
+
+F) Translation output box (result panel)
+- File: frontend/src/components/TranslationBox.tsx
+- Section name in code comments: Output Area
+
+G) Speaker option for translated text
+- File: frontend/src/components/TranslationBox.tsx
+- Component used: TextToSpeech
+
+H) Voice input (mic for source text)
+- File: frontend/src/components/TranslationBox.tsx
+- Component used: VoiceInput
+
+I) File upload modal
+- File: frontend/src/components/TranslationBox.tsx
+- Child component: frontend/src/components/FileUpload.tsx
+
+J) History modal
+- File: frontend/src/components/TranslationBox.tsx
+- Child component: frontend/src/components/HistoryList.tsx
+
+K) Batch translation section
+- File: frontend/src/components/TranslationBox.tsx
+- Child component: frontend/src/components/BatchTranslation.tsx
+
+L) Quality analysis section
+- File: frontend/src/components/TranslationBox.tsx
+- Child component: frontend/src/components/TranslationQuality.tsx
+
+M) Export options
+- File: frontend/src/components/TranslationBox.tsx
+- Child component: frontend/src/components/ExportTranslation.tsx
+
+N) Chat panel
+- Parent page: frontend/src/pages/TranslatePage.tsx
+- Component: frontend/src/components/ChatbotPanel.tsx
+
+O) Image translation page/box
+- Route/page switch in: frontend/src/App.tsx
+- Component: frontend/src/components/ImageTranslate.tsx
+
+P) About page
+- File: frontend/src/pages/AboutPage.tsx
+
+Useful viva one-liner
+"UI starts in main.tsx, App.tsx controls page navigation, TranslatePage.tsx arranges sections, and TranslationBox.tsx contains the main translation card (From/To, input, Translate, output, speaker, history, upload)."

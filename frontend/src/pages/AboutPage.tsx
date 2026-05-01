@@ -51,7 +51,7 @@ export default function AboutPage() {
         className="text-center mb-16"
       >
         <h1 className="text-5xl font-bold mb-6 gradient-text">
-          ZeroDay1 Translation System
+          BUGBUSTERS Translation System
         </h1>
         <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
           Advanced neural machine translation for Nepali and Sinhala to English,
@@ -254,7 +254,7 @@ export default function AboutPage() {
       >
         <div className="inline-block glass-effect rounded-full px-6 py-3 border border-border">
           <span className="text-sm font-semibold">
-            🏆 SIH 2025 Problem ID: SIH25240 | Team: ZeroDay1
+            🏆 SIH 2025 Problem ID: SIH25240 | Team: BUGBUSTERS
           </span>
         </div>
       </motion.div>

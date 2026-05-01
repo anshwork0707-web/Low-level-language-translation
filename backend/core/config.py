@@ -17,8 +17,8 @@ BASE_MODEL_NAME = "facebook/nllb-200-distilled-600M"
 
 # Language codes
 LANG_CODES = {
-    "nepali": "nep_Latn",
-    "sinhala": "sin_Latn",
+    "nepali": "npi_Deva",
+    "sinhala": "sin_Sinh",
     "english": "eng_Latn"
 }
 

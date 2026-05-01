@@ -26,7 +26,7 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
               <Languages className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold gradient-text">ZeroDay1</h1>
+              <h1 className="text-xl font-bold gradient-text">BUGBUSTERS</h1>
               <p className="text-xs text-muted-foreground">Translation System</p>
             </div>
           </motion.div>

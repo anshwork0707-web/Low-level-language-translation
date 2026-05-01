@@ -9,13 +9,15 @@ router = APIRouter(prefix="/translate", tags=["Translation"])
 
 class TranslateRequest(BaseModel):
     text: str = Field(..., description="Text to translate", min_length=1)
-    source_lang: str = Field(..., description="Source language: 'nepali' or 'sinhala'")
+    source_lang: str = Field(..., description="Source language: 'english', 'nepali', or 'sinhala'")
+    target_lang: str = Field(default="english", description="Target language: 'english', 'nepali', or 'sinhala'")
     
     class Config:
         json_schema_extra = {
             "example": {
                 "text": "नमस्ते",
-                "source_lang": "nepali"
+                "source_lang": "nepali",
+                "target_lang": "english"
             }
         }
 
@@ -31,30 +33,41 @@ class TranslateResponse(BaseModel):
 @router.post("/", response_model=TranslateResponse)
 async def translate(req: TranslateRequest):
     """
-    Translate Nepali or Sinhala text to English.
+    Translate between English, Nepali, and Sinhala.
     
     - **text**: Text to translate (required)
-    - **source_lang**: Source language - 'nepali' or 'sinhala' (required)
+    - **source_lang**: Source language - 'english', 'nepali', or 'sinhala' (required)
+    - **target_lang**: Target language - 'english', 'nepali', or 'sinhala' (optional, default='english')
     """
     try:
-        logger.info(f"Translation request: {req.source_lang} → English")
+        logger.info(f"Translation request: {req.source_lang} → {req.target_lang}")
         
-        # Validate source language
-        if not req.source_lang.lower().startswith(('n', 's')):
+        valid_languages = {"english", "nepali", "sinhala", "sinhalese"}
+        source_lang = req.source_lang.lower().strip()
+        target_lang = req.target_lang.lower().strip()
+        if source_lang == "sinhalese":
+            source_lang = "sinhala"
+        if target_lang == "sinhalese":
+            target_lang = "sinhala"
+
+        # Validate languages
+        if source_lang not in valid_languages or target_lang not in valid_languages:
             raise HTTPException(
                 status_code=400,
-                detail="source_lang must be 'nepali' or 'sinhala'"
+                detail="source_lang and target_lang must be one of: english, nepali, sinhala"
             )
+        if source_lang == target_lang:
+            raise HTTPException(status_code=400, detail="source_lang and target_lang cannot be the same")
         
         # Perform translation
-        translation = translate_text(req.text, req.source_lang)
+        translation = translate_text(req.text, source_lang, target_lang)
         
         # Format response
         result = format_translation_result(
             original=req.text,
             translation=translation,
-            source_lang=req.source_lang,
-            target_lang="english"
+            source_lang=source_lang,
+            target_lang=target_lang
         )
         
         return {
@@ -70,19 +83,20 @@ async def translate(req: TranslateRequest):
 
 
 @router.post("/batch")
-async def batch_translate(texts: list[str], source_lang: str):
+async def batch_translate(texts: list[str], source_lang: str, target_lang: str = "english"):
     """
     Translate multiple texts in batch.
     
     - **texts**: List of texts to translate
     - **source_lang**: Source language for all texts
+    - **target_lang**: Target language for all texts
     """
     try:
         logger.info(f"Batch translation: {len(texts)} texts")
         
         translations = []
         for text in texts:
-            translation = translate_text(text, source_lang)
+            translation = translate_text(text, source_lang, target_lang)
             translations.append({
                 "original": text,
                 "translation": translation
@@ -91,7 +105,8 @@ async def batch_translate(texts: list[str], source_lang: str):
         return {
             "translations": translations,
             "count": len(translations),
-            "source_language": source_lang
+            "source_language": source_lang,
+            "target_language": target_lang
         }
         
     except Exception as e:

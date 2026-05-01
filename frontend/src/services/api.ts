@@ -7,22 +7,26 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 30000, // 30 seconds
+  timeout: 120000, // 120 seconds for longer translation requests
 })
 
 // Translation API
-export const translateAPI = async (data: { text: string; source_language: string }) => {
+export const translateAPI = async (data: { text: string; source_language: string; target_language?: string }) => {
   try {
     const response = await api.post('/translate/', {
       text: data.text,
       source_lang: data.source_language,  // Backend expects 'source_lang'
+      target_lang: data.target_language,
     })
     return response.data
   } catch (error: any) {
+    if (error.code === 'ECONNABORTED') {
+      throw new Error('Translation timed out for a long input. Please retry or split into smaller parts.')
+    }
     if (error.response) {
       throw new Error(error.response.data.detail || 'Translation failed')
     } else if (error.request) {
-      throw new Error('Backend server is not responding. Please ensure the API is running.')
+      throw new Error(`Backend server is not responding at ${API_BASE_URL}. Please ensure the API is running.`)
     } else {
       throw new Error('An unexpected error occurred')
     }
@@ -33,9 +37,14 @@ export const translateAPI = async (data: { text: string; source_language: string
 export const batchTranslateAPI = async (data: {
   texts: string[]
   source_language: string
+  target_language?: string
 }) => {
   try {
-    const response = await api.post('/batch-translate/', data)
+    const response = await api.post('/batch-translate/', {
+      texts: data.texts,
+      source_language: data.source_language,
+      target_language: data.target_language,
+    })
     return response.data
   } catch (error: any) {
     if (error.response) {

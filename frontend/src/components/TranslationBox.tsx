@@ -39,6 +39,8 @@ interface TranslationBoxProps {
 
 type Language = 'nepali' | 'sinhala' | 'english'
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+
 const SAMPLE_TEXTS = {
   nepali: [
     'नमस्ते, तपाईंलाई कस्तो छ?',
@@ -153,7 +155,7 @@ export default function TranslationBox({
     }
 
     try {
-      const response = await fetch('http://localhost:8000/translate/correction', {
+      const response = await fetch(`${API_BASE_URL}/translate/correction`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -319,7 +321,7 @@ export default function TranslationBox({
               exit={{ opacity: 0, height: 0 }}
               className="mb-6 pb-6 border-b border-border"
             >
-              <BatchTranslation sourceLang={sourceLang} />
+              <BatchTranslation sourceLang={sourceLang} targetLang={targetLang} />
             </motion.div>
           )}
         </AnimatePresence>

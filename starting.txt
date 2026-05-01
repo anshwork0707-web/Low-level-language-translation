@@ -1,0 +1,16 @@
+cd D:\PROJECTS\HACKATHON\sih_datasets
+& .\.venv\Scripts\Activate.ps1
+python -m uvicorn main:app --app-dir D:\PROJECTS\HACKATHON\sih_datasets\backend --host 0.0.0.0 --port 8000
+
+
+cd D:\PROJECTS\HACKATHON\sih_datasets\java-backend
+$env:JAVA_HOME="C:\Users\lenovo\.jdk\jdk-17.0.16"
+$env:M2_HOME="C:\Users\lenovo\.maven\maven-3.9.14"
+$env:Path="$env:JAVA_HOME\bin;$env:M2_HOME\bin;" + $env:Path
+mvn spring-boot:run
+
+
+
+cd D:\PROJECTS\HACKATHON\sih_datasets\frontend
+npm install
+npm run dev -- --host --port 3000

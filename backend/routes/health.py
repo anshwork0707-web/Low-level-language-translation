@@ -31,8 +31,8 @@ async def model_status():
         "device": translator_model.device if model_loaded else "not loaded",
         "cuda_available": torch.cuda.is_available(),
         "model_type": "NLLB-200 + LoRA",
-        "supported_languages": ["nepali", "sinhala"],
-        "target_language": "english"
+        "supported_languages": ["english", "nepali", "sinhala"],
+        "target_languages": ["english", "nepali", "sinhala"]
     }
 
 
@@ -45,7 +45,7 @@ async def feature_status():
         "translation": {
             "available": translator_model.model is not None,
             "model": "NLLB-200 with LoRA adapters",
-            "languages": ["Nepali → English", "Sinhala → English"]
+            "languages": ["English ↔ Nepali", "English ↔ Sinhala", "Nepali ↔ Sinhala"]
         },
         "ocr": {
             "available": OCR_AVAILABLE,
